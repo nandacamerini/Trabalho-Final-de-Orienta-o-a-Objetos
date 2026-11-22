@@ -1,4 +1,4 @@
-ID;IdCliente,IdLivro,Data
+ID;IdCliente,IdLivro,Data,Quantidade Renovacoes
 100;3;1;10/11/2026;0
 100;3;2;10/11/2026;0
 101;4;3;28/10/2026;1

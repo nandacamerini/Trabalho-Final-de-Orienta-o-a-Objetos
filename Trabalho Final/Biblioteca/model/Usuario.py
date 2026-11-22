@@ -34,10 +34,13 @@ class Usuario(ABC):
     def autenticar(self, login, senha):
         return self.__login == login and self.__senha == senha
 
-    @abstractmethod
-    def tipo(self):
-        pass
+#    @abstractmethod
+#    def tipo(self):
+#        pass
 
     @abstractmethod
     def menu(self):
         pass
+
+    def __str__(self):
+        return f"Código: {self.__codigo} | Nome: {self.__nome} | Login: {self.__login}"
