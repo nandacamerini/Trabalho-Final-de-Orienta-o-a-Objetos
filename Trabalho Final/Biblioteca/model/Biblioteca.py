@@ -22,7 +22,7 @@ class Biblioteca():
         if usuario in self.__usuarios:
             self.__usuarios.remove(usuario)
 
-    def addLivros(self, livro: Livro):
+    def addLivro(self, livro: Livro):
         self.__livros.append(livro)
 
     def removeLivro(self, livro: Livro):
@@ -38,7 +38,7 @@ class Biblioteca():
 
     def buscarCliente(self, codigo):
         for usuario in self.__usuarios:
-            if usuario.getCodigo() == codigo:
+            if isinstance(usuario, Cliente) and usuario.getCodigo() == codigo:
                 return usuario
 
         return None

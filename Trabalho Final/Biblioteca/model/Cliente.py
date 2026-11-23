@@ -4,7 +4,7 @@ from model.Usuario import Usuario
 class Cliente(Usuario):
     def __init__(self, codigo: int, nome: str, login: str, senha: str):
         super().__init__(codigo, nome, login, senha)
-        self.__emprestimos = self.getEmprestimos()
+        self.__emprestimos = []
 
     def getEmprestimos(self):
         pass
