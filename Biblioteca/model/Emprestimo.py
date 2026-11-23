@@ -27,6 +27,9 @@ class Emprestimo:
         self.__livros.append(livro)
         return True
 
+    def getCliente(self):
+        return self.__cliente
+
     def getLivros(self):
             return self.__livros
     

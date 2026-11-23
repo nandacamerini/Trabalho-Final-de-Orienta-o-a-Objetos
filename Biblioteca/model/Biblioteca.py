@@ -15,6 +15,9 @@ class Biblioteca():
     def getUsuarios(self):
         return self.__usuarios
 
+    def getEmprestimos(self):
+        return self.__emprestimos
+
     def addUsuario(self, usuario: Usuario):
         self.__usuarios.append(usuario)
 
