@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 from model.Usuario import Usuario
 from model.Cliente import Cliente
 from model.Bibliotecario import Bibliotecario
@@ -34,6 +35,21 @@ class Biblioteca():
     def removeEmprestimo(self, emprestimo: Emprestimo):
         if emprestimo in self.__emprestimos:
             self.__emprestimos.remove(emprestimo)
+
+    def buscarCliente(self, codigo):
+        for usuario in self.__usuarios:
+            if usuario.getCodigo() == codigo:
+                return usuario
+
+        return None
+
+    def buscarLivro(self, codigo):
+        for livro in self.__livros:
+            if livro.getCodigo() == codigo:
+                return livro
+
+        return None
+
 
     def lerArquivo(self, caminhoArquivo):
         dados = []
@@ -103,8 +119,9 @@ class Biblioteca():
 
     def carregarEmprestimos(self, caminhoArquivo):
         dados = self.lerArquivo(caminhoArquivo)
+        emprestimosAgrupados = {}
+        # Primeiro: agrupa os livros pelo ID do empréstimo
         for partes in dados:
-
             if len(partes) != 5:
                 continue
 
@@ -114,9 +131,51 @@ class Biblioteca():
             data = partes[3]
             renovacoes = int(partes[4])
 
-            emprestimo = Emprestimo(codigo, codigoCliente, codigoLivro, data, renovacoes)
-            self.addEmprestimo(emprestimo)
-        #debug
+            if codigo not in emprestimosAgrupados:
+                emprestimosAgrupados[codigo] = {
+                    "cliente": codigoCliente,
+                    "livros": [],
+                    "data": data,
+                    "renovacoes": renovacoes
+                }
+
+            emprestimosAgrupados[codigo]["livros"].append(codigoLivro)
+
+        # Segundo: instancia os empréstimos agrupados
+        for codigo, informacoes in emprestimosAgrupados.items():
+
+            if len(informacoes["livros"]) < 1 or len(informacoes["livros"]) > 3:
+                continue
+
+            # Busca o objeto Cliente
+            cliente = self.buscarCliente(informacoes["cliente"])
+
+            if cliente is None:
+                continue
+
+            # Converte a data para datetime
+            data = datetime.strptime(informacoes["data"], "%d/%m/%Y")
+
+            # Cria o empréstimo
+            emprestimo = Emprestimo(
+                codigo,
+                cliente,
+                data,
+                informacoes["renovacoes"]
+            )
+
+            # Busca e adiciona os objetos Livro
+            for codigoLivro in informacoes["livros"]:
+                livro = self.buscarLivro(codigoLivro)
+
+                if livro is not None:
+                    emprestimo.addLivro(livro)
+
+            # Só adiciona se todos os livros foram encontrados
+            if len(emprestimo.getLivros()) == len(informacoes["livros"]):
+                self.addEmprestimo(emprestimo)
+
+        # Debug
         print("Empréstimos instanciados")
         for i in range(len(self.__emprestimos)):
             print(self.__emprestimos[i])

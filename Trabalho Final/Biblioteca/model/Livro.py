@@ -4,5 +4,8 @@ class Livro:
         self.__nome = nome
         self.__autor = autor
 
+    def getCodigo(self):
+        return self.__codigo
+
     def __str__(self):
         return f"Código: {self.__codigo} | Nome: {self.__nome} | Autor: {self.__autor}"

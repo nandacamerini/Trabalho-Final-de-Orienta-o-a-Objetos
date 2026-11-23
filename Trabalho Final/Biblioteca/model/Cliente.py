@@ -1,6 +1,5 @@
 from pathlib import Path
 from model.Usuario import Usuario
-from model.Emprestimo import Emprestimo
 
 class Cliente(Usuario):
     def __init__(self, codigo: int, nome: str, login: str, senha: str):
