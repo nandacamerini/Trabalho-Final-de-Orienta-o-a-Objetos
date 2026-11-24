@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from pathlib import Path
 from model.Cliente import Cliente
 from model.Livro import Livro
 class Emprestimo:
@@ -10,7 +9,12 @@ class Emprestimo:
     MULTA_POR_DIA = 1.50
     MAX_LIVROS = 3
 
-    def __init__(self, codigo: int, cliente: Cliente, data: datetime, renovacoes: int):
+    def __init__(self, codigo: int, cliente: Cliente,
+                data: datetime, renovacoes: int):
+
+        if renovacoes < 0 or renovacoes > self.MAX_RENOVACOES:
+            raise ValueError("Quantidade de renovações inválida.")
+
         self.__codigo = codigo
         self.__cliente = cliente
         self.__livros = []
@@ -27,7 +31,7 @@ class Emprestimo:
         return self.__data
 
     def getLivros(self):
-        return self.__livros
+        return self.__livros.copy()
 
     def getRenovacoes(self):
         return self.__renovacoes
@@ -43,7 +47,7 @@ class Emprestimo:
         return True
 
     def removeLivro(self, livro: Livro):
-        if len(self.__livros) <= 0:
+        if len(self.__livros) <= 1:
             return False
 
         if livro not in self.__livros:
@@ -52,21 +56,20 @@ class Emprestimo:
         self.__livros.remove(livro)
         return True
 
-    #Devoluções e multa
+    # Devoluções e multa
     def dataDevolucao(self):
-        prazo = self.PRAZO_DIAS + (self.DIAS_RENOVACAO * self.__renovacoes)
+        prazo = self.PRAZO_DIAS + (
+            self.DIAS_RENOVACAO * self.__renovacoes
+        )
 
         return self.__data + timedelta(days=prazo)
 
     def diasAtraso(self, dataAtual):
         dataPrevista = self.dataDevolucao()
 
-        if dataAtual <= dataPrevista:
-            return 0
+        atraso = dataAtual.date() - dataPrevista.date()
 
-        atraso = dataAtual - dataPrevista
-
-        return atraso.days
+        return max(0, atraso.days)
 
     def calcularMulta(self, dataAtual):
         dias = self.diasAtraso(dataAtual)
@@ -76,7 +79,7 @@ class Emprestimo:
 
         return multa
 
-    #Renovações
+    # Renovações
     def podeRenovar(self, dataAtual):
         if self.__renovacoes >= self.MAX_RENOVACOES:
             return False
@@ -94,27 +97,6 @@ class Emprestimo:
 
         return True
 
-
-
-    
-    def getEmprestimosUsuario(self, usuario):
-        listaEmprestimos = []
-        arquivo = Path(__file__).resolve().parent.parent / "emprestimos.txt"
-        try:
-            with arquivo.open("r", encoding="utf-8") as emprestimos:
-                linhas = emprestimos.readlines()
-
-                print(f"Empréstimos de {usuario.getNome()}")
-                for linha in linhas[1:]:
-                    dados = linha.strip().split(";")
-
-                    if dados[1] == usuario.getCodigo():
-                        listaEmprestimos.append(f"Código do livro: {dados[2]}," 
-                                                "data inicial: {dados[3]},"
-                                                "data de devolução: ")
-        except FileNotFoundError:
-            print(f"Arquivo emprestimos.txt não encontrado.\n")
-
     def __str__(self):
         codigosLivros = []
 
@@ -123,9 +105,12 @@ class Emprestimo:
 
         livros = ", ".join(codigosLivros)
 
-        return (f"Código do empréstimo: {self.__codigo}\n"
-                f"Código do cliente: {self.__cliente.getCodigo()}\n"
-                f"Códigos dos livros: {livros}\n"
-                f"Data do empréstimo: {self.__data.strftime('%d/%m/%Y')}\n"
-                f"Data de devolução: {self.dataDevolucao().strftime('%d/%m/%Y')}\n"
-                f"Renovações: {self.__renovacoes}")
+        return (
+            f"Código do empréstimo: {self.__codigo}\n"
+            f"Código do cliente: {self.__cliente.getCodigo()}\n"
+            f"Códigos dos livros: {livros}\n"
+            f"Data do empréstimo: {self.__data.strftime('%d/%m/%Y')}\n"
+            f"Data de devolução: "
+            f"{self.dataDevolucao().strftime('%d/%m/%Y')}\n"
+            f"Renovações: {self.__renovacoes}"
+        )
