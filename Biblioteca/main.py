@@ -1,27 +1,49 @@
-from model.Cliente import Cliente
 from model.Biblioteca import Biblioteca
 from datetime import datetime
+
+
 def principal():
-    # Teste das funções do Cliente.py (a parte de login tem que ficar no Biblioteca.py)
+    dataAtual = datetime.now()
+
+    # Carrega os arquivos
     biblioteca = Biblioteca()
     biblioteca.carregarArquivos()
 
-    dataAtual = datetime(2026, 11, 23)
+    # Busca o cliente
+    cliente = biblioteca.buscarCliente(3)
 
-    print("\n===== TESTE DE RENOVAÇÕES =====")
+    if cliente is None:
+        print("Cliente não encontrado.")
+        return
 
-    for emprestimo in biblioteca.getEmprestimos():
-        resultado = emprestimo.renovar(dataAtual)
+    print("=" * 45)
+    print("       TESTE DO SISTEMA DE BIBLIOTECA")
+    print("=" * 45)
 
-        print(f"\nEmpréstimo: {emprestimo.getCodigo()}")
+    # TESTE 1: Visualizar empréstimos e multas
+    print("\n===== TESTE 1: EMPRÉSTIMOS E MULTAS =====")
+    cliente.mostrarEmprestimosVisiveis(biblioteca, dataAtual)
 
-        if resultado:
-            print("Renovação realizada!")
-        else:
-            print("Não foi possível renovar.")
+    # TESTE 2: Renovar um empréstimo
+    print("\n===== TESTE 2: RENOVAÇÃO DE EMPRÉSTIMO =====")
+    cliente.renovarEmprestimo(biblioteca, dataAtual)
 
-        print(f"Quantidade de renovações: {emprestimo.getRenovacoes()}")
-        print(f"Nova data de devolução: {emprestimo.dataDevolucao().strftime('%d/%m/%Y')}")
+    # TESTE 3: Verificar se a renovação foi salva
+    print("\n===== TESTE 3: VERIFICAR GRAVAÇÃO NO TXT =====")
+
+    novaBiblioteca = Biblioteca()
+    novaBiblioteca.carregarArquivos()
+
+    novoCliente = novaBiblioteca.buscarCliente(3)
+
+    if novoCliente is None:
+        print("Não foi possível carregar o cliente novamente.")
+        return
+
+    novoCliente.mostrarEmprestimosVisiveis(novaBiblioteca, dataAtual)
+
+    print("\n===== FIM DOS TESTES =====")
+
 
 if __name__ == "__main__":
     principal()

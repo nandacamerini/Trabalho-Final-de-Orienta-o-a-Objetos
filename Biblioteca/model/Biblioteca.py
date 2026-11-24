@@ -18,6 +18,15 @@ class Biblioteca():
     def getEmprestimos(self):
         return self.__emprestimos
 
+    def getEmprestimosUsuario(self, usuario: Cliente):
+        listaEmprestimos = []
+
+        for emprestimo in self.__emprestimos:
+            if emprestimo.getCliente().getCodigo() == usuario.getCodigo():
+                listaEmprestimos.append(emprestimo)
+
+        return listaEmprestimos
+
     def addUsuario(self, usuario: Usuario):
         self.__usuarios.append(usuario)
 
@@ -169,6 +178,33 @@ class Biblioteca():
             # Só adiciona se todos os livros foram encontrados
             if len(emprestimo.getLivros()) == len(informacoes["livros"]):
                 self.addEmprestimo(emprestimo)
+
+    def salvarEmprestimos(self):
+        caminhoArquivo = Path(__file__).resolve().parent.parent / "emprestimos.txt"
+
+        try:
+            with caminhoArquivo.open("w", encoding="utf-8") as arquivo:
+                arquivo.write("codigo;codCliente;codLivro;data;renovacoes\n")
+
+                for emprestimo in self.__emprestimos:
+                    codigo = emprestimo.getCodigo()
+                    codigoCliente = emprestimo.getCliente().getCodigo()
+                    data = emprestimo.getDataEmprestimo().strftime("%d/%m/%Y")
+                    renovacoes = emprestimo.getRenovacoes()
+
+                    for livro in emprestimo.getLivros():
+                        codigoLivro = livro.getCodigo()
+
+                        arquivo.write(
+                            f"{codigo};{codigoCliente};{codigoLivro};"
+                            f"{data};{renovacoes}\n"
+                        )
+
+            return True
+
+        except OSError:
+            print("Não foi possível salvar os empréstimos no arquivo.")
+            return False
 
 
     def carregarArquivos(self):
