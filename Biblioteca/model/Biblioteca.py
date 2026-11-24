@@ -25,7 +25,7 @@ class Biblioteca():
         if usuario in self.__usuarios:
             self.__usuarios.remove(usuario)
 
-    def addLivros(self, livro: Livro):
+    def addLivro(self, livro: Livro):
         self.__livros.append(livro)
 
     def removeLivro(self, livro: Livro):
@@ -41,7 +41,7 @@ class Biblioteca():
 
     def buscarCliente(self, codigo):
         for usuario in self.__usuarios:
-            if usuario.getCodigo() == codigo:
+            if isinstance(usuario, Cliente) and usuario.getCodigo() == codigo:
                 return usuario
 
         return None
@@ -97,10 +97,6 @@ class Biblioteca():
             elif tipo_usuario == "Bibliotecario":
                 usuario = Bibliotecario(codigo, nome, login, senha_hash)
                 self.addUsuario(usuario)
-        #debug
-        print("usuário instanciados")
-        for i in range(len(self.__usuarios)):
-            print(self.__usuarios[i])
 
     def carregarLivros(self, caminhoArquivo):
         dados = self.lerArquivo(caminhoArquivo)
@@ -114,11 +110,7 @@ class Biblioteca():
             autor = partes[2]
 
             livro = Livro(codigo, nome, autor)
-            self.addLivros(livro)
-        #debug
-        print("livros instanciados")
-        for i in range(len(self.__livros)):
-            print(self.__livros[i])
+            self.addLivro(livro)
 
     def carregarEmprestimos(self, caminhoArquivo):
         dados = self.lerArquivo(caminhoArquivo)
@@ -178,10 +170,6 @@ class Biblioteca():
             if len(emprestimo.getLivros()) == len(informacoes["livros"]):
                 self.addEmprestimo(emprestimo)
 
-        # Debug
-        print("Empréstimos instanciados")
-        for i in range(len(self.__emprestimos)):
-            print(self.__emprestimos[i])
 
     def carregarArquivos(self):
         #Carrega e instancia os objetos dos usuários, livros e emprestimos
